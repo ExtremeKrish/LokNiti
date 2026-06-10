@@ -56,6 +56,7 @@
     <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-green/10 rounded-full blur-3xl pointer-events-none"></div>
 
+    <!-- Top Navigation Header -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="window.location.reload()">
@@ -87,9 +88,11 @@
 
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full z-10 flex flex-col justify-center">
 
+        <!-- ================= HOME SCREEN ================= -->
         <div id="screen-home" class="space-y-12 transition-all duration-300">
             <div class="text-center max-w-3xl mx-auto space-y-6">
                 
+                <!-- Shared Challenge Card (Only visible when opening an invite link) -->
                 <div id="challenge-invite-header" class="hidden animate-bounce max-w-xl mx-auto bg-gradient-to-r from-indigo-500/10 to-indigo-500/20 border border-indigo-500/30 px-5 py-3 rounded-2xl flex items-center justify-between text-left gap-4">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg shrink-0">
@@ -127,15 +130,21 @@
                     </div>
                 </div>
 
-                <div class="pt-4 flex justify-center">
-                    <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center space-x-3 text-lg">
-                        <span>Begin 15-Question Quiz</span>
+                <!-- Core Navigation Action Controls -->
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                    <button onclick="startQuiz()" class="w-full px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center space-x-3 text-lg">
+                        <span>Take the Quiz</span>
                         <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="generateInviteFromHome()" class="w-full px-6 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 text-lg">
+                        <i class="fa-solid fa-share-nodes"></i>
+                        <span>Generate & Share Link</span>
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- ================= QUIZ SCREEN ================= -->
         <div id="screen-quiz" class="hidden max-w-2xl mx-auto w-full transition-all duration-300">
             <div class="space-y-4 mb-8">
                 <div class="flex justify-between items-center text-sm font-semibold">
@@ -147,6 +156,7 @@
                 </div>
             </div>
 
+            <!-- Question Card Block -->
             <div id="question-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-2xl relative overflow-hidden animate-question-slide">
                 <div class="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
                 
@@ -161,6 +171,7 @@
                     </div>
                 </div>
 
+                <!-- Options Grid -->
                 <div class="space-y-3" id="options-container">
                     <button onclick="recordAnswer(2)" class="group w-full p-4 bg-slate-800/40 hover:bg-emerald-950/20 border border-slate-700/60 hover:border-emerald-500/50 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
                         <div class="flex items-center space-x-3">
@@ -194,6 +205,7 @@
                     </button>
                 </div>
 
+                <!-- Previous action row -->
                 <div class="flex justify-between items-center pt-2 border-t border-slate-800/85">
                     <button id="btn-prev" onclick="goToPreviousQuestion()" class="px-5 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/40 text-slate-300 text-sm font-semibold transition-all flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
                         <i class="fa-solid fa-arrow-left"></i>
@@ -204,8 +216,10 @@
             </div>
         </div>
 
+        <!-- ================= RESULTS SCREEN ================= -->
         <div id="screen-results" class="hidden space-y-8 transition-all duration-300">
             
+            <!-- Comparison header active notification badge -->
             <div id="comparison-view-alert" class="hidden max-w-4xl mx-auto bg-gradient-to-r from-indigo-950/40 to-slate-900 border border-indigo-500/40 rounded-3xl p-6 text-center space-y-3">
                 <span class="bg-indigo-500/20 text-indigo-300 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-widest"><i class="fa-solid fa-user-friends mr-1"></i> Matchup Active</span>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-white">Comparing with <span id="shared-friend-name" class="text-orange-400">Friend</span></h3>
@@ -328,7 +342,7 @@
                     <div class="flex flex-col sm:flex-row gap-3 pt-2">
                         <button onclick="shareResultsLink()" class="flex-grow py-3.5 px-6 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 text-lg">
                             <i class="fa-solid fa-share-nodes"></i>
-                            <span>Share My Result to Compare</span>
+                            <span>Generate My Share Link</span>
                         </button>
                     </div>
                 </div>
@@ -353,17 +367,41 @@
         </div>
     </main>
 
+    <!-- Custom Dialog Modal -->
+    <div id="custom-alert-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-3xl max-w-md w-full shadow-2xl space-y-4">
+            <div class="flex items-center space-x-3 text-amber-400">
+                <i class="fa-solid fa-triangle-exclamation text-2xl animate-pulse"></i>
+                <h4 class="text-lg font-bold text-white">Quiz Evaluation Needed</h4>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed" id="custom-alert-text">
+                To create a comparison profile link for friends, you must run the compass analysis first!
+            </p>
+            <div class="pt-2 flex justify-end space-x-3">
+                <button onclick="dismissAlertModal()" class="px-4 py-2 text-slate-400 hover:text-white text-xs font-semibold">Dismiss</button>
+                <button onclick="dismissAlertModal(); startQuiz();" class="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold rounded-xl shadow-md">Begin Quiz</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast-message" class="fixed bottom-5 right-5 z-50 hidden bg-emerald-950 border border-emerald-500/50 text-emerald-200 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm animate-bounce">
         <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
         <span id="toast-text">Success!</span>
     </div>
 
+    <!-- Footer Block -->
+    <footer class="border-t border-slate-800 bg-slate-950/60 py-6 text-center text-xs text-slate-500 space-y-1 z-10">
+        <p>&copy; 2026 LokNiti. Dynamic Indian Political Spectrum Matrix.</p>
+        <p>Values & questions formulated around historical policy documents & modern socio-legal dynamics.</p>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // Hardcoded live Firebase project config details
         const firebaseConfig = {
             apiKey: "AIzaSyC4Zoi_mGB-qG6vnXRz1m91VYDsmTVG-cI",
             authDomain: "lokniti-quiz.firebaseapp.com",
@@ -379,15 +417,16 @@
         const db = getFirestore(app);
         const appId = 'lokniti-compass-app';
 
+        // 15 contextual questions for the Indian political compass
         const quizQuestions = [
             { id: 1, category: "Public Welfare & Economics", text: "The government must prioritize privatizing debt-ridden public sector undertakings (PSUs) and state-run banks to enable free-market efficiency.", explanation: "Selling government-run businesses to private owners to increase efficiency.", weightX: 1.8, weightY: -0.4 },
             { id: 2, category: "Subsidies & Fiscal Balance", text: "State welfare schemes like direct cash transfers and free electricity are necessary policies for poor empowerment, despite rising fiscal deficits.", explanation: "Providing benefits like free power or cash to poor families, even if it increases state debt.", weightX: -1.7, weightY: 0.3 },
             { id: 3, category: "Social Justice", text: "Reservation (affirmative action) in education and employment should eventually be replaced by purely economic criteria or meritocratic evaluation.", explanation: "Shifting reservations to financial income instead of caste.", weightX: 1.3, weightY: -0.3 },
             { id: 4, category: "Censorship & Expression", text: "The state has a primary duty to filter or censor films, literary works, and social media posts that threaten public order or hurt religious beliefs.", explanation: "Banning movies or posts to prevent social conflict or stop religious sentiments from getting hurt.", weightX: 0.2, weightY: 2.2 },
-            { id: 5, category: "Security & Civil Liberties", text: "Strict internal surveillance and laws like UAPA or AFSPA are entirely justified to preserve state integrity, even if individual privacy is compromised.", explanation: "Using tough security laws to stop national threats, even if it limits personal freedom.", weightX: 0.4, weightY: 2.4 },
+            { id: 5, category: "Security & Civil Liberties", text: "Strict internal surveillance and laws like UAPA or AFSPA are justified to preserve state integrity, even if individual privacy is compromised.", explanation: "Using tough security laws to stop national threats, even if it limits personal freedom.", weightX: 0.4, weightY: 2.4 },
             { id: 6, category: "Civil Rights & Religion", text: "A Uniform Civil Code (UCC) should be implemented uniformly across India to replace religious personal laws governing marriage and inheritance.", explanation: "Replacing religious marriage/property rules with one common law code for all.", weightX: 1.4, weightY: 0.5 },
-            { id: 7, category: "Corporate & Labor Laws", text: "To accelerate manufacturing investments, India must simplify labor codes, giving companies absolute liberty over hiring, firing, and wage terms.", explanation: "Making business laws easier so factories can hire & fire employees easily.", weightX: 1.9, weightY: -0.4 },
-            { id: 8, category: "Cultural Legality", text: "The legal prohibition on cow slaughter across Indian states should be fully supported to protect sacred traditions and local community beliefs.", explanation: "Banning cow slaughter by law out of respect for religious traditions.", weightX: 1.4, weightY: 1.8 },
+            { id: 7, category: "Corporate & Labor Laws", text: "To accelerate manufacturing investments, India must simplify labor codes, giving companies absolute liberty over hiring, firing, and wage terms.", explanation: "Making business laws easier so companies can hire & fire employees easily.", weightX: 1.9, weightY: -0.4 },
+            { id: 8, category: "Cultural Legality", text: "The prohibition on cow slaughter across Indian states should be fully supported to protect sacred traditions and local community beliefs.", explanation: "Banning cow slaughter by law out of respect for religious traditions.", weightX: 1.4, weightY: 1.8 },
             { id: 9, category: "Ecology vs Development", text: "Major infrastructure programs like multi-lane highways or mines should proceed with urgency, even if they displace forest communities or disrupt ecology.", explanation: "Prioritizing massive development projects over environmental conservation.", weightX: 1.5, weightY: 0.6 },
             { id: 10, category: "Personal Freedom", text: "Adult individuals should have complete autonomy over their marital, relationship, and dietary choices (including beef or local meat) without state interference.", explanation: "Complete freedom for adults regarding eating habits and marriage without government rules.", weightX: -0.9, weightY: -2.0 },
             { id: 11, category: "Wealth & Taxes", text: "The government should introduce higher wealth taxes and inheritance taxes on the ultra-rich to fund expansive rural healthcare and education.", explanation: "Taxing super-rich families extra to build free rural hospitals and schools.", weightX: -1.8, weightY: 0.4 },
@@ -398,7 +437,11 @@
         ];
 
         const scoreLabels = {
-            "2": "Strongly Agree", "1": "Agree", "0": "Neutral", "-1": "Disagree", "-2": "Strongly Disagree"
+            "2": "Strongly Agree",
+            "1": "Agree",
+            "0": "Neutral",
+            "-1": "Disagree",
+            "-2": "Strongly Disagree"
         };
 
         let currentQuestionIndex = 0;
@@ -407,17 +450,27 @@
         let finalCoordX = 0.0;
         let finalCoordY = 0.0;
         
-        // Persistent User ID for their own sharing
+        // Local identification details
         let myUserId = localStorage.getItem('lokniti_stored_user_id');
         if (!myUserId) {
             myUserId = "user_" + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('lokniti_stored_user_id', myUserId);
         }
 
-        // Invite variables
+        // Invite and Comparison flow parameters
         let inviterId = null;
         let inviterData = null;
 
+        // Custom alert controls
+        window.showAlertModal = (text) => {
+            document.getElementById('custom-alert-text').innerText = text;
+            document.getElementById('custom-alert-modal').classList.remove('hidden');
+        };
+        window.dismissAlertModal = () => {
+            document.getElementById('custom-alert-modal').classList.add('hidden');
+        };
+
+        // Inline indicator controls
         const updateCloudIndicator = (status, text) => {
             const pulse = document.getElementById('cloud-pulse-color');
             const dot = document.getElementById('cloud-dot-color');
@@ -427,45 +480,60 @@
             dot.className = "relative inline-flex rounded-full h-2 w-2";
 
             if (status === "syncing") {
-                pulse.classList.add("bg-amber-400"); dot.classList.add("bg-amber-500");
+                pulse.classList.add("bg-amber-400");
+                dot.classList.add("bg-amber-500");
             } else if (status === "ready") {
-                pulse.classList.add("bg-emerald-400"); dot.classList.add("bg-emerald-500");
+                pulse.classList.add("bg-emerald-400");
+                dot.classList.add("bg-emerald-500");
             } else {
-                pulse.classList.add("bg-rose-400"); dot.classList.add("bg-rose-500");
+                pulse.classList.add("bg-rose-400");
+                dot.classList.add("bg-rose-500");
             }
         };
 
+        // Main initialization
         const initApp = async () => {
             updateCloudIndicator("syncing", "Connecting...");
             try {
+                // Rule 3: Auth first
                 await signInAnonymously(auth);
+                
+                // Read query params
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.has('invite')) {
                     inviterId = urlParams.get('invite');
+                    
+                    // Rule 1 & Rule 2: Single document fetch path
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', inviterId);
                     const snapshot = await getDoc(docRef);
+                    
                     if (snapshot.exists()) {
                         inviterData = snapshot.data();
+                        
+                        // Show invite context on home screen
                         document.getElementById('challenge-invite-header').classList.remove('hidden');
                         document.getElementById('challenger-name-label').innerText = inviterData.userName;
-                        updateCloudIndicator("ready", `Challenged by ${inviterData.userName}`);
+                        
+                        updateCloudIndicator("ready", `Invited by ${inviterData.userName}`);
                     } else {
-                        updateCloudIndicator("ready", "Ready");
+                        updateCloudIndicator("ready", "Cloud Synchronized");
                     }
                 } else {
-                    updateCloudIndicator("ready", "Ready");
+                    updateCloudIndicator("ready", "Cloud Synchronized");
                 }
             } catch (err) {
-                console.error("Firebase Error: ", err);
-                updateCloudIndicator("offline", "Offline");
+                console.error("Firebase startup issues: ", err);
+                updateCloudIndicator("offline", "Database Offline");
             }
         };
 
         initApp();
 
+        // Start Quiz Trigger
         window.startQuiz = () => {
             const inputVal = document.getElementById('user-name-input').value.trim();
             if (inputVal) userName = inputVal;
+            
             document.getElementById('screen-home').classList.add('hidden');
             document.getElementById('screen-quiz').classList.remove('hidden');
             currentQuestionIndex = 0;
@@ -477,6 +545,7 @@
             const q = quizQuestions[currentQuestionIndex];
             const card = document.getElementById('question-card');
             
+            // Animation reset
             card.classList.remove('animate-question-slide');
             void card.offsetWidth; 
             card.classList.add('animate-question-slide');
@@ -484,28 +553,33 @@
             document.getElementById('question-category').innerText = q.category;
             document.getElementById('question-text').innerText = q.text;
             document.getElementById('question-explanation').innerText = q.explanation;
+            
             document.getElementById('quiz-progress-current').innerText = currentQuestionIndex + 1;
             
             const pct = Math.round((currentQuestionIndex / quizQuestions.length) * 100);
             document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
-            document.getElementById('quiz-progress-percent').innerText = `${pct}%`;
+            document.getElementById('quiz-progress-percent').innerText = `${pct}% Completed`;
+
             document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
 
+            // Clear previous highlight selections
             const btns = document.getElementById('options-container').children;
             for (let btn of btns) {
                 btn.classList.remove('bg-slate-800', 'border-indigo-500/50', 'ring-2', 'ring-indigo-500/20');
                 btn.classList.add('bg-slate-800/40', 'border-slate-700/60');
             }
             
+            // Highlight previous answer if it exists
             if (userAnswers[currentQuestionIndex] !== null) {
                 const val = userAnswers[currentQuestionIndex];
-                const idxMap = {2:0, 1:1, 0:2, "-1":3, "-2":4};
+                const idxMap = { 2: 0, 1: 1, 0: 2, "-1": 3, "-2": 4 };
                 const targetBtn = btns[idxMap[val]];
                 targetBtn.classList.remove('bg-slate-800/40', 'border-slate-700/60');
                 targetBtn.classList.add('bg-slate-800', 'border-indigo-500/50', 'ring-2', 'ring-indigo-500/20');
             }
         };
 
+        // Option selection
         window.recordAnswer = (val) => {
             userAnswers[currentQuestionIndex] = val;
             setTimeout(() => {
@@ -519,12 +593,17 @@
         };
 
         window.goToPreviousQuestion = () => {
-            if (currentQuestionIndex > 0) { currentQuestionIndex--; renderQuestion(); }
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
         };
 
         const finishQuiz = async () => {
-            updateCloudIndicator("syncing", "Calculating...");
-            let tx=0, ty=0, mx=0, my=0;
+            updateCloudIndicator("syncing", "Saving Results...");
+            
+            // Calculate coordinates
+            let tx = 0, ty = 0, mx = 0, my = 0;
             quizQuestions.forEach((q, i) => {
                 const ans = userAnswers[i];
                 tx += ans * q.weightX;
@@ -532,23 +611,34 @@
                 mx += 2.0 * Math.abs(q.weightX);
                 my += 2.0 * Math.abs(q.weightY);
             });
+            
             finalCoordX = parseFloat(((tx / mx) * 10).toFixed(1));
             finalCoordY = parseFloat(((ty / my) * 10).toFixed(1));
 
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', myUserId);
-                await setDoc(docRef, {
-                    userId: myUserId,
-                    userName: userName,
-                    x: finalCoordX,
-                    y: finalCoordY,
-                    answers: userAnswers,
-                    timestamp: Date.now()
-                });
-                updateCloudIndicator("ready", "Saved");
-            } catch (e) {
-                console.error("Save Error:", e);
-                updateCloudIndicator("offline", "Save Failed");
+            // Save to Firestore
+            if (auth.currentUser) {
+                try {
+                    // Rule 1: Strict collection paths
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', myUserId);
+                    await setDoc(docRef, {
+                        userId: myUserId,
+                        userName: userName,
+                        x: finalCoordX,
+                        y: finalCoordY,
+                        answers: userAnswers,
+                        timestamp: Date.now()
+                    });
+                    
+                    // Backup locally
+                    localStorage.setItem('lokniti_my_completed_results', JSON.stringify({
+                        userName, x: finalCoordX, y: finalCoordY, answers: userAnswers
+                    }));
+                    
+                    updateCloudIndicator("ready", "Data Synced");
+                } catch (e) {
+                    console.error("Firebase save failure:", e);
+                    updateCloudIndicator("offline", "Saved Locally");
+                }
             }
 
             document.getElementById('screen-quiz').classList.add('hidden');
@@ -558,17 +648,19 @@
         };
 
         const renderResults = () => {
-            // Plot User
+            // Plot User Dot (Pink)
             const targetCX = 200 + (finalCoordX * 18);
             const targetCY = 200 - (finalCoordY * 18);
+            
             document.getElementById('user-dot').setAttribute('cx', targetCX);
             document.getElementById('user-dot').setAttribute('cy', targetCY);
             document.getElementById('user-dot-pulse').setAttribute('cx', targetCX);
             document.getElementById('user-dot-pulse').setAttribute('cy', targetCY);
+            
             document.getElementById('coord-display-x').innerText = finalCoordX > 0 ? `+${finalCoordX}` : finalCoordX;
             document.getElementById('coord-display-y').innerText = finalCoordY > 0 ? `+${finalCoordY}` : finalCoordY;
 
-            // Determine Quadrant
+            // Determine Quadrant Category
             let qTitle = "", qDesc = "";
             if (finalCoordX >= 0 && finalCoordY >= 0) {
                 qTitle = "Authoritarian Right: National Conservatism";
@@ -583,28 +675,37 @@
                 qTitle = "Libertarian Right: Laissez-Faire Liberalism";
                 qDesc = "You advocate for deregulation, privatization, and an open market coupled with expansive civil and lifestyle liberties. You reject heavy tax structures and public sector ownership.";
             }
+            
             document.getElementById('result-quadrant-name').innerText = qTitle;
             document.getElementById('result-quadrant-desc').innerText = qDesc;
 
-            // Setup Bars
+            // Render Axis breakdown bars
             const xp = ((finalCoordX + 10) / 20) * 100;
             const yp = ((finalCoordY + 10) / 20) * 100;
-            const bx = document.getElementById('score-bar-x'), by = document.getElementById('score-bar-y');
-            bx.style.left = `${Math.min(xp, 50)}%`; bx.style.width = `${Math.abs(xp - 50)}%`;
+            
+            const bx = document.getElementById('score-bar-x');
+            const by = document.getElementById('score-bar-y');
+            
+            bx.style.left = `${Math.min(xp, 50)}%`; 
+            bx.style.width = `${Math.abs(xp - 50)}%`;
             bx.className = `absolute h-full rounded-full transition-all duration-500 ${finalCoordX < 0 ? 'bg-rose-500' : 'bg-blue-500'}`;
-            by.style.left = `${Math.min(yp, 50)}%`; by.style.width = `${Math.abs(yp - 50)}%`;
+            
+            by.style.left = `${Math.min(yp, 50)}%`; 
+            by.style.width = `${Math.abs(yp - 50)}%`;
             by.className = `absolute h-full bottom-0 rounded-full transition-all duration-500 ${finalCoordY < 0 ? 'bg-emerald-500' : 'bg-violet-500'}`;
 
-            // Handle Inviter Comparison Logic
+            // If we are evaluating a comparison matchup invitation
             if (inviterData) {
                 document.getElementById('comparison-view-alert').classList.remove('hidden');
                 document.getElementById('shared-friend-name').innerText = inviterData.userName;
                 
+                // Show Friend legend indicator details
                 document.getElementById('friend-map-legend').classList.remove('hidden');
                 document.getElementById('friend-legend-name').innerText = inviterData.userName;
                 document.getElementById('friend-coord-display-x').innerText = inviterData.x > 0 ? `+${inviterData.x}` : inviterData.x;
                 document.getElementById('friend-coord-display-y').innerText = inviterData.y > 0 ? `+${inviterData.y}` : inviterData.y;
                 
+                // Show Friend Dot (Sky Blue) on SVG Compass Map
                 document.getElementById('friend-dot-group').classList.remove('hidden');
                 document.getElementById('friend-dot').setAttribute('cx', 200 + (inviterData.x * 18));
                 document.getElementById('friend-dot').setAttribute('cy', 200 - (inviterData.y * 18));
@@ -612,7 +713,7 @@
                 document.getElementById('ballot-card-description').innerHTML = `Comparing your answers side-by-side with <span class="text-orange-400 font-semibold">${inviterData.userName}</span>.`;
             }
 
-            // Render Full Ballot List
+            // Build the results list dynamically
             const listContainer = document.getElementById('comparative-ballot-list');
             listContainer.innerHTML = '';
             
@@ -660,16 +761,60 @@
             });
         };
 
+        // Home page Generate Link trigger handler
+        window.generateInviteFromHome = () => {
+            const completedStr = localStorage.getItem('lokniti_my_completed_results');
+            if (completedStr) {
+                // User has done a quiz previously on this browser
+                const shareLink = `${SITE_URL}?invite=${myUserId}`;
+                copyTextToClipboard(shareLink);
+            } else {
+                // User must take the quiz first to preserve comparison data integrity
+                showAlertModal("You must complete the quiz first to generate a comparison link, so your friends can see how your political opinions align with theirs!");
+            }
+        };
+
+        // Share results from compilation dashboard
         window.shareResultsLink = () => {
-            const link = `${SITE_URL}?invite=${myUserId}`;
-            navigator.clipboard.writeText(link).then(() => {
-                const toast = document.getElementById('toast-message');
-                document.getElementById('toast-text').innerText = "Invite link copied to clipboard!";
-                toast.classList.remove('hidden');
-                setTimeout(() => toast.classList.add('hidden'), 3500);
-            }).catch(err => {
-                alert("Failed to copy link. Please check your browser permissions.");
-            });
+            const shareLink = `${SITE_URL}?invite=${myUserId}`;
+            copyTextToClipboard(shareLink);
+        };
+
+        // Fallback-safe copy routine
+        const copyTextToClipboard = (text) => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    triggerToast("Invite link copied to clipboard!");
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        };
+
+        const fallbackCopy = (text) => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed'; 
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                triggerToast("Invite link copied to clipboard!");
+            } catch (err) {
+                showAlertModal(`Please copy this link manually: ${text}`);
+            }
+            document.body.removeChild(textarea);
+        };
+
+        const triggerToast = (msg) => {
+            const toast = document.getElementById('toast-message');
+            document.getElementById('toast-text').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
         };
     </script>
 </body>
