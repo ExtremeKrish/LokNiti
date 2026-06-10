@@ -136,7 +136,8 @@
                         <span>Take the Quiz</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
-                    <button onclick="generateInviteFromHome()" class="w-full px-6 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 text-lg">
+                    <!-- Hidden if the user arrives from an invite URL link -->
+                    <button id="btn-home-generate" onclick="generateInviteFromHome()" class="w-full px-6 py-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold rounded-xl transition-all flex items-center justify-center space-x-2 text-lg">
                         <i class="fa-solid fa-share-nodes"></i>
                         <span>Generate & Share Link</span>
                     </button>
@@ -348,6 +349,29 @@
                 </div>
             </div>
 
+            <!-- ================= private peer-to-peer friends dashboard ================= -->
+            <div id="host-friends-dashboard" class="hidden bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 mt-8">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Friends Who Took Your Quiz</h3>
+                            <p class="text-xs text-slate-400">P2P Tracking: Only you can see this dashboard list.</p>
+                        </div>
+                    </div>
+                    <span id="friends-count-badge" class="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-xs font-bold">0 Friends</span>
+                </div>
+
+                <div id="friends-grid-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Dynamic friend response list mapped on screen -->
+                    <div class="col-span-full py-6 text-center text-slate-500 text-sm">
+                        No friends have completed your shared matchup quiz yet. Share your invite link above to collect profiles!
+                    </div>
+                </div>
+            </div>
+
             <div id="comparative-ballot-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 mt-8">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
@@ -399,7 +423,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Hardcoded live Firebase project config details
         const firebaseConfig = {
@@ -450,7 +474,7 @@
         let finalCoordX = 0.0;
         let finalCoordY = 0.0;
         
-        // Local identification details
+        // Persistent User Identification (Local Storage check)
         let myUserId = localStorage.getItem('lokniti_stored_user_id');
         if (!myUserId) {
             myUserId = "user_" + Math.random().toString(36).substr(2, 9);
@@ -460,6 +484,7 @@
         // Invite and Comparison flow parameters
         let inviterId = null;
         let inviterData = null;
+        let p2pFriendsList = [];
 
         // Custom alert controls
         window.showAlertModal = (text) => {
@@ -513,6 +538,9 @@
                         // Show invite context on home screen
                         document.getElementById('challenge-invite-header').classList.remove('hidden');
                         document.getElementById('challenger-name-label').innerText = inviterData.userName;
+                        
+                        // Hide share button on home page if invite is active (Feedback 1)
+                        document.getElementById('btn-home-generate').classList.add('hidden');
                         
                         updateCloudIndicator("ready", `Invited by ${inviterData.userName}`);
                     } else {
@@ -626,6 +654,7 @@
                         x: finalCoordX,
                         y: finalCoordY,
                         answers: userAnswers,
+                        invitedBy: inviterId || null, // Saves who invited this user (Passive sync loop)
                         timestamp: Date.now()
                     });
                     
@@ -645,6 +674,87 @@
             document.getElementById('screen-results').classList.remove('hidden');
 
             renderResults();
+            
+            // If user is the host, pull friends list
+            if (!inviterId) {
+                await fetchFriendsList();
+            }
+        };
+
+        // Load friends completed list passively for the host (Feedback 2 & 3)
+        const fetchFriendsList = async () => {
+            if (!auth.currentUser) return;
+            try {
+                updateCloudIndicator("syncing", "Loading matchups...");
+                const resultsColl = collection(db, 'artifacts', appId, 'public', 'data', 'results');
+                // Query friends whose `invitedBy` equals our ID
+                const q = query(resultsColl, where('invitedBy', '==', myUserId));
+                const snapshot = await getDocs(q);
+                
+                p2pFriendsList = [];
+                snapshot.forEach((docSnap) => {
+                    p2pFriendsList.push(docSnap.data());
+                });
+
+                renderFriendsDashboard();
+                updateCloudIndicator("ready", "Dashboard Loaded");
+            } catch (err) {
+                console.error("Could not fetch friends:", err);
+            }
+        };
+
+        const renderFriendsDashboard = () => {
+            const container = document.getElementById('friends-grid-list');
+            const dashboardSection = document.getElementById('host-friends-dashboard');
+            const countBadge = document.getElementById('friends-count-badge');
+            
+            dashboardSection.classList.remove('hidden');
+            countBadge.innerText = `${p2pFriendsList.length} Completed`;
+            container.innerHTML = '';
+
+            if (p2pFriendsList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-6 text-center text-slate-500 text-sm">
+                        No friends have completed your shared matchup quiz yet. Share your invite link above to collect profiles!
+                    </div>
+                `;
+                return;
+            }
+
+            p2pFriendsList.forEach((friend, idx) => {
+                let alignment = "Moderate Spectrum";
+                if (friend.x >= 0 && friend.y >= 0) alignment = "National Conservatism";
+                else if (friend.x < 0 && friend.y >= 0) alignment = "State Socialism";
+                else if (friend.x < 0 && friend.y < 0) alignment = "Grassroots Swaraj";
+                else if (friend.x >= 0 && friend.y < 0) alignment = "Laissez-Faire Liberal";
+
+                container.insertAdjacentHTML('beforeend', `
+                    <div class="p-4 bg-slate-950/40 border border-slate-800 hover:border-indigo-500/30 rounded-2xl flex flex-col justify-between space-y-4 transition-all">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-white text-base">${friend.userName}</h4>
+                            <span class="text-[10px] text-indigo-400 font-extrabold uppercase block tracking-wider">${alignment}</span>
+                            <span class="text-xs text-slate-500 block font-mono">Coords: (${friend.x}, ${friend.y})</span>
+                        </div>
+                        <button onclick="compareWithFriendInline('${friend.userId}')" class="w-full py-2 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-arrows-left-right"></i>
+                            <span>Compare Stances</span>
+                        </button>
+                    </div>
+                `);
+            });
+        };
+
+        // Host clicks "Compare Stances" directly on dashboard without URL refresh
+        window.compareWithFriendInline = (friendId) => {
+            const friend = p2pFriendsList.find(f => f.userId === friendId);
+            if (!friend) return;
+
+            inviterData = friend; // Bind as comparative dataset
+            document.getElementById('comparison-view-alert').classList.remove('hidden');
+            document.getElementById('shared-friend-name').innerText = friend.userName;
+            
+            renderResults();
+            document.getElementById('comparative-ballot-card').scrollIntoView({ behavior: 'smooth' });
         };
 
         const renderResults = () => {
@@ -672,7 +782,7 @@
                 qTitle = "Libertarian Left: Grassroots Swaraj";
                 qDesc = "You believe in localized governance, direct democracy, and decentralized economics. You support extensive welfare networks, environmental safeguards, and vigorous advocacy for personal liberty.";
             } else {
-                qTitle = "Libertarian Right: Laissez-Faire Liberalism";
+                qTitle = "Libertarian Right: Laissez-Faire Liberal";
                 qDesc = "You advocate for deregulation, privatization, and an open market coupled with expansive civil and lifestyle liberties. You reject heavy tax structures and public sector ownership.";
             }
             
