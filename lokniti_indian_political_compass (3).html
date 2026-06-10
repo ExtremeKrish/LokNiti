@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LokNiti India - The Indian Political Compass Quiz</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            orange: '#FF9933',
+                            white: '#FFFFFF',
+                            green: '#138808',
+                            navy: '#000080'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for beautiful icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Pulse Animation for user coordinate */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.6); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        .pulse-marker {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+        }
+
+        /* Question change transition animation */
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-question-slide {
+            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- Decorative Top Glow Elements -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-orange/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-green/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Main Header / Navigation -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetQuizToHome()">
+                <!-- Ashoka Chakra inspired decorative SVG icon -->
+                <svg class="w-8 h-8 text-indigo-400" viewBox="0 0 100 100" style="animation: spin 30s linear infinite;">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                    <circle cx="50" cy="50" r="8" fill="currentColor"></circle>
+                    <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="1.5"></line>
+                    <line x1="5" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="1.5"></line>
+                    <line x1="18" y1="18" x2="82" y2="82" stroke="currentColor" stroke-width="1"></line>
+                    <line x1="18" y1="82" x2="82" y2="18" stroke="currentColor" stroke-width="1"></line>
+                </svg>
+                <div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-orange-400 via-slate-100 to-emerald-400 bg-clip-text text-transparent">LokNiti</span>
+                    <span class="text-xs block text-slate-400 font-medium tracking-widest uppercase">Indian Political Compass</span>
+                </div>
+            </div>
+            
+            <!-- Sleek Non-Intrusive Cloud Sync Status Indicators -->
+            <div class="flex items-center space-x-4">
+                <div id="inline-cloud-indicator" class="flex items-center space-x-2 px-3 py-1 bg-slate-800/80 border border-slate-700/50 rounded-full text-[11px] text-slate-400 transition-all">
+                    <span class="relative flex h-2 w-2">
+                        <span id="cloud-pulse-color" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span id="cloud-dot-color" class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    <span id="cloud-status-text">Connecting...</span>
+                </div>
+                <button onclick="openInfoModal()" class="text-slate-400 hover:text-white transition-colors p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50">
+                    <i class="fa-solid fa-circle-info text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Interactive Container -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full z-10 flex flex-col justify-center">
+
+        <!-- ================= HOME SCREEN ================= -->
+        <div id="screen-home" class="space-y-12 transition-all duration-300">
+            <div class="text-center max-w-3xl mx-auto space-y-6">
+                
+                <!-- Dynamic Challenge Card (Triggered if visiting via invite link) -->
+                <div id="challenge-invite-header" class="hidden animate-bounce max-w-xl mx-auto bg-gradient-to-r from-indigo-500/10 to-indigo-500/20 border border-indigo-500/30 px-5 py-3 rounded-2xl flex items-center justify-between text-left gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-swords"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">COMPASS CHALLENGE</span>
+                            <p class="text-xs text-slate-300 font-medium">
+                                <span id="challenger-name-label" class="text-orange-400 font-semibold">A friend</span> has invited you to compare political spectras!
+                            </p>
+                        </div>
+                    </div>
+                    <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-lg font-bold shrink-0">Invited</span>
+                </div>
+
+                <div class="inline-flex items-center space-x-2 bg-slate-800/80 border border-slate-700 px-4 py-1.5 rounded-full text-sm text-indigo-300 shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+                    <span>Tailored Specifically for the Indian Political Landscape</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-none text-white">
+                    Where Do You Stand on the <br>
+                    <span class="bg-gradient-to-r from-orange-400 via-slate-100 to-emerald-400 bg-clip-text text-transparent">Indian Political Spectrum?</span>
+                </h1>
+                <p class="text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                    Western models of Left and Right often fail in India. Discover your exact coordinates on our multi-dimensional grid mapping India's unique socio-economic debates, welfare policies, identity systems, and state models.
+                </p>
+
+                <!-- Name Input Box Card -->
+                <div class="max-w-md mx-auto bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                    <label class="block text-sm font-semibold text-slate-300 text-left">Enter your name to begin:</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="user-name-input" placeholder="e.g. Rahul, Priya, Amit..." class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all font-medium">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-xl shadow-lg shadow-orange-900/30 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 flex items-center justify-center space-x-3 text-lg">
+                        <span>Begin Analysis Quiz</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="scrollToMethodology()" class="w-full sm:w-auto px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-xl transition-all flex items-center justify-center space-x-3 text-lg">
+                        <span>View Methodology</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-xl">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white">India-Centric Formulation</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Questions designed around reservation policies, public sector undertakings, Uniform Civil Code, and state security apparatuses.
+                    </p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 text-xl">
+                        <i class="fa-solid fa-compass"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white">Two-Dimensional Plotting</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Evaluates both Economic Alignment (Left-Right) and Civil/State Authority (Authoritarian-Libertarian).
+                    </p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl space-y-3 hover:border-slate-700 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white">Live Cloud Matchups</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Share your unique comparison invite. Your friends can check their positions against your live coordinate plots!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ SCREEN ================= -->
+        <div id="screen-quiz" class="hidden max-w-2xl mx-auto w-full transition-all duration-300">
+            <!-- Progress Tracker -->
+            <div class="space-y-4 mb-8">
+                <div class="flex justify-between items-center text-sm font-semibold">
+                    <span class="text-slate-400">Question <span id="quiz-progress-current" class="text-white">1</span> of <span id="quiz-progress-total">15</span></span>
+                    <span class="text-indigo-400" id="quiz-progress-percent">0% Completed</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="quiz-progress-bar" class="bg-gradient-to-r from-orange-500 via-indigo-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div id="question-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-2xl relative overflow-hidden animate-question-slide">
+                <div class="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="space-y-4">
+                    <span id="question-category" class="inline-block text-xs font-bold uppercase tracking-wider text-orange-400 bg-orange-400/10 px-3 py-1 rounded-full">ECONOMY</span>
+                    <h2 id="question-text" class="text-lg sm:text-2xl font-bold text-white leading-snug">
+                        Loading question...
+                    </h2>
+                    
+                    <!-- Question Simple English Explanation Box -->
+                    <div class="flex gap-2.5 p-3.5 bg-slate-950/60 border border-slate-800 rounded-xl">
+                        <span class="text-indigo-400 mt-0.5"><i class="fa-solid fa-lightbulb"></i></span>
+                        <div class="text-xs text-slate-400 leading-relaxed font-normal">
+                            <span class="font-bold text-slate-300">In simple terms:</span> <span id="question-explanation">No explanation loaded.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MCQs / Option Buttons -->
+                <div class="space-y-3" id="options-container">
+                    <button onclick="recordAnswer(2)" class="group w-full p-4 bg-slate-800/40 hover:bg-emerald-950/20 border border-slate-700/60 hover:border-emerald-500/50 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">A</div>
+                            <span class="text-sm sm:text-base font-semibold text-slate-300 group-hover:text-white transition-colors">Strongly Agree</span>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-slate-600 group-hover:text-emerald-400 text-lg transition-colors"></i>
+                    </button>
+
+                    <button onclick="recordAnswer(1)" class="group w-full p-4 bg-slate-800/40 hover:bg-emerald-950/10 border border-slate-700/60 hover:border-emerald-500/30 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/5 text-emerald-300 flex items-center justify-center font-bold text-sm group-hover:bg-emerald-400 group-hover:text-white transition-all">B</div>
+                            <span class="text-sm sm:text-base font-medium text-slate-300 group-hover:text-white transition-colors">Agree</span>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-slate-600 group-hover:text-emerald-300 text-lg transition-colors"></i>
+                    </button>
+
+                    <button onclick="recordAnswer(0)" class="group w-full p-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-700/50 text-slate-400 flex items-center justify-center font-bold text-sm group-hover:bg-slate-600 group-hover:text-white transition-all">C</div>
+                            <span class="text-sm sm:text-base font-medium text-slate-300 group-hover:text-white transition-colors">Neutral / Unsure</span>
+                        </div>
+                        <i class="fa-solid fa-circle-notch text-slate-600 group-hover:text-slate-400 text-lg transition-colors"></i>
+                    </button>
+
+                    <button onclick="recordAnswer(-1)" class="group w-full p-4 bg-slate-800/40 hover:bg-rose-950/10 border border-slate-700/60 hover:border-rose-500/30 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-rose-500/5 text-rose-300 flex items-center justify-center font-bold text-sm group-hover:bg-rose-400 group-hover:text-white transition-all">D</div>
+                            <span class="text-sm sm:text-base font-medium text-slate-300 group-hover:text-white transition-colors">Disagree</span>
+                        </div>
+                        <i class="fa-solid fa-circle-xmark text-slate-600 group-hover:text-rose-300 text-lg transition-colors"></i>
+                    </button>
+
+                    <button onclick="recordAnswer(-2)" class="group w-full p-4 bg-slate-800/40 hover:bg-rose-950/20 border border-slate-700/60 hover:border-rose-500/50 rounded-2xl flex items-center justify-between transition-all duration-150 text-left active:scale-[0.99]">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-sm group-hover:bg-rose-500 group-hover:text-white transition-all">E</div>
+                            <span class="text-sm sm:text-base font-semibold text-slate-300 group-hover:text-white transition-colors">Strongly Disagree</span>
+                        </div>
+                        <i class="fa-solid fa-circle-xmark text-slate-600 group-hover:text-rose-400 text-lg transition-colors"></i>
+                    </button>
+                </div>
+
+                <!-- Card Actions -->
+                <div class="flex justify-between items-center pt-2 border-t border-slate-800/85">
+                    <button id="btn-prev" onclick="goToPreviousQuestion()" class="px-5 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/40 text-slate-300 text-sm font-semibold transition-all flex items-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Previous</span>
+                    </button>
+                    <span class="text-xs text-slate-500 italic">Select an option to advance automatically</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= RESULTS SCREEN ================= -->
+        <div id="screen-results" class="hidden space-y-8 transition-all duration-300">
+            
+            <!-- Welcome Comparison Header (Shows ONLY if User finished via an invite link) -->
+            <div id="comparison-view-alert" class="hidden max-w-4xl mx-auto bg-gradient-to-r from-orange-500/20 via-indigo-950/40 to-emerald-500/20 border border-indigo-500/40 rounded-3xl p-6 text-center space-y-3">
+                <span class="bg-indigo-500/20 text-indigo-300 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-widest"><i class="fa-solid fa-user-friends mr-1"></i> Compass Matchup Active</span>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-white">Comparing with <span id="shared-friend-name" class="text-orange-400">Friend</span>'s LokNiti Spectrum</h3>
+                <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
+                    Both profiles are plotted side-by-side. Scroll down to look at the comparative ballot sheet to inspect individual answers!
+                </p>
+                <div class="pt-2">
+                    <button onclick="startFreshQuiz()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i> Clear & Take My Own Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Results Header -->
+            <div class="text-center space-y-3">
+                <span class="inline-flex items-center space-x-1.5 bg-indigo-500/10 border border-indigo-500/30 px-4 py-1 rounded-full text-xs font-bold text-indigo-300 tracking-wider uppercase">Political Mapping Loaded</span>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white"><span id="results-name-prefix">Your</span> Indian Political Profile</h1>
+                <p class="text-slate-400 text-sm sm:text-base max-w-xl mx-auto">Dynamic cloud-synced matrix coordinate calculations.</p>
+            </div>
+
+            <!-- Two Column Layout: Chart & Summary Card -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- SVG Interactive Compass Block (lg:col-span-6) -->
+                <div class="lg:col-span-6 flex flex-col items-center bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-3xl shadow-2xl relative">
+                    <div class="absolute top-4 left-4 z-10 flex flex-col space-y-1.5 items-start">
+                        <div class="flex items-center space-x-2 bg-slate-950/80 border border-slate-800 px-3 py-1 rounded-full text-xs">
+                            <span class="w-2.5 h-2.5 rounded-full bg-pink-500 pulse-marker block"></span>
+                            <span class="text-slate-300 font-semibold"><span id="legend-name-label">Your</span> Spot: (<span id="coord-display-x" class="text-pink-400">0.0</span>, <span id="coord-display-y" class="text-pink-400">0.0</span>)</span>
+                        </div>
+                        <!-- Friend Map Indicator Legend (Dynamic) -->
+                        <div id="friend-map-legend" class="hidden flex items-center space-x-2 bg-slate-950/80 border border-slate-800 px-3 py-1 rounded-full text-xs">
+                            <span class="w-2.5 h-2.5 rounded-full bg-sky-400 block"></span>
+                            <span class="text-slate-300 font-semibold"><span id="friend-legend-name">Friend</span>: (<span id="friend-coord-display-x" class="text-sky-400">0.0</span>, <span id="friend-coord-display-y" class="text-sky-400">0.0</span>)</span>
+                        </div>
+                    </div>
+
+                    <!-- Compass Render Wrapper -->
+                    <div class="w-full max-w-[430px] aspect-square relative select-none mt-10">
+                        <!-- Compass SVG -->
+                        <svg id="compass-svg" class="w-full h-full rounded-2xl bg-slate-950 overflow-hidden shadow-inner" viewBox="0 0 400 400">
+                            <!-- Background Quadrants -->
+                            <!-- Top-Left: Authoritarian Left (Red/Rose) -->
+                            <rect x="0" y="0" width="200" height="200" fill="#f43f5e" fill-opacity="0.12"></rect>
+                            <!-- Top-Right: Authoritarian Right (Blue/Indigo) -->
+                            <rect x="200" y="0" width="200" height="200" fill="#3b82f6" fill-opacity="0.12"></rect>
+                            <!-- Bottom-Left: Libertarian Left (Green/Emerald) -->
+                            <rect x="0" y="200" width="200" height="200" fill="#10b981" fill-opacity="0.12"></rect>
+                            <!-- Bottom-Right: Libertarian Right (Magenta) -->
+                            <rect x="200" y="200" width="200" height="200" fill="#d946ef" fill-opacity="0.12"></rect>
+
+                            <!-- Sub-grid lines -->
+                            <!-- Vertical guides -->
+                            <line x1="40" y1="0" x2="40" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="80" y1="0" x2="80" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="120" y1="0" x2="120" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="160" y1="0" x2="160" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="240" y1="0" x2="240" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="280" y1="0" x2="280" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="320" y1="0" x2="320" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="360" y1="0" x2="360" y2="400" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <!-- Horizontal guides -->
+                            <line x1="0" y1="40" x2="400" y2="40" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="80" x2="400" y2="80" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="120" x2="400" y2="120" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="160" x2="400" y2="160" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="240" x2="400" y2="240" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="280" x2="400" y2="280" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="320" x2="400" y2="320" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+                            <line x1="0" y1="360" x2="400" y2="360" stroke="#475569" stroke-opacity="0.15" stroke-dasharray="2"></line>
+
+                            <!-- Core Cartesian Axes -->
+                            <line x1="0" y1="200" x2="400" y2="200" stroke="#94a3b8" stroke-width="2.5" opacity="0.6"></line>
+                            <line x1="200" y1="0" x2="200" y2="400" stroke="#94a3b8" stroke-width="2.5" opacity="0.6"></line>
+
+                            <!-- Axes Text Anchors -->
+                            <text x="200" y="15" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="800" letter-spacing="1.5">AUTHORITARIAN</text>
+                            <text x="200" y="392" text-anchor="middle" fill="#f1f5f9" font-size="10" font-weight="800" letter-spacing="1.5">LIBERTARIAN</text>
+                            <text x="5" y="204" text-anchor="start" fill="#f1f5f9" font-size="10" font-weight="800" letter-spacing="1.5">LEFT</text>
+                            <text x="395" y="204" text-anchor="end" fill="#f1f5f9" font-size="10" font-weight="800" letter-spacing="1.5">RIGHT</text>
+
+                            <!-- Quadrant Micro labels in corners -->
+                            <text x="10" y="35" fill="#f43f5e" font-size="9" font-weight="700" opacity="0.6">State Socialism</text>
+                            <text x="390" y="35" text-anchor="end" fill="#3b82f6" font-size="9" font-weight="700" opacity="0.6">National Conservatism</text>
+                            <text x="10" y="375" fill="#10b981" font-size="9" font-weight="700" opacity="0.6">Grassroots Swaraj</text>
+                            <text x="390" y="375" text-anchor="end" fill="#d946ef" font-size="9" font-weight="700" opacity="0.6">Laissez-Faire Liberal</text>
+
+                            <!-- Political Benchmarks -->
+                            <g class="benchmark-point cursor-pointer" onclick="highlightBenchmark('nehru')" opacity="0.5">
+                                <circle cx="130" cy="140" r="5" fill="#38bdf8" stroke="#1e293b" stroke-width="1.5"></circle>
+                                <text x="130" y="130" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Nehru-Era</text>
+                            </g>
+                            <g class="benchmark-point cursor-pointer" onclick="highlightBenchmark('bjp')" opacity="0.5">
+                                <circle cx="290" cy="110" r="5" fill="#f97316" stroke="#1e293b" stroke-width="1.5"></circle>
+                                <text x="290" y="100" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Modern BJP</text>
+                            </g>
+                            <g class="benchmark-point cursor-pointer" onclick="highlightBenchmark('cpim')" opacity="0.5">
+                                <circle cx="56" cy="100" r="5" fill="#ef4444" stroke="#1e293b" stroke-width="1.5"></circle>
+                                <text x="56" y="90" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">CPI(M)</text>
+                            </g>
+                            <g class="benchmark-point cursor-pointer" onclick="highlightBenchmark('swatantra')" opacity="0.5">
+                                <circle cx="326" cy="280" r="5" fill="#a855f7" stroke="#1e293b" stroke-width="1.5"></circle>
+                                <text x="326" y="270" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Swatantra Party</text>
+                            </g>
+                            <g class="benchmark-point cursor-pointer" onclick="highlightBenchmark('gandhian')" opacity="0.5">
+                                <circle cx="120" cy="308" r="5" fill="#10b981" stroke="#1e293b" stroke-width="1.5"></circle>
+                                <text x="120" y="298" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Gandhian Swaraj</text>
+                            </g>
+
+                            <!-- User Target Dot -->
+                            <g id="user-dot-group">
+                                <circle id="user-dot-pulse" cx="200" cy="200" r="14" fill="#ec4899" fill-opacity="0.3" class="pulse-marker"></circle>
+                                <circle id="user-dot" cx="200" cy="200" r="7" fill="#ec4899" stroke="#ffffff" stroke-width="2"></circle>
+                            </g>
+
+                            <!-- Friend Target Dot (Plotted dynamically) -->
+                            <g id="friend-dot-group" class="hidden">
+                                <circle id="friend-dot" cx="200" cy="200" r="7" fill="#38bdf8" stroke="#ffffff" stroke-width="2"></circle>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Comparison Info Trigger Box -->
+                    <div class="mt-4 w-full bg-slate-950/40 border border-slate-800 rounded-xl p-3 text-center">
+                        <span class="text-xs text-slate-400 block"><i class="fa-solid fa-circle-nodes text-indigo-400 mr-1.5"></i> Tap political benchmark flags on the compass map to inspect details</span>
+                    </div>
+                </div>
+
+                <!-- Profile summary (lg:col-span-6) -->
+                <div class="lg:col-span-6 space-y-6">
+                    <!-- Quadrant Highlight Card -->
+                    <div class="bg-gradient-to-r from-indigo-950/40 to-slate-900 border border-indigo-500/30 p-6 rounded-3xl space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-flag"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider"><span id="alert-quadrant-prefix">Your</span> Alignment Result</span>
+                                <h2 id="result-quadrant-name" class="text-2xl font-black text-white">Calculating...</h2>
+                            </div>
+                        </div>
+                        <p id="result-quadrant-desc" class="text-slate-300 text-sm leading-relaxed">
+                            Generating detailed alignment summary report...
+                        </p>
+                    </div>
+
+                    <!-- Individual Axis Scores Display -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-5">
+                        <h3 class="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2">Incremental Dimension Details</h3>
+                        
+                        <!-- X Axis bar (Economic Left/Right) -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="text-rose-400 flex items-center gap-1"><i class="fa-solid fa-angles-left"></i> Left Economic</span>
+                                <span class="text-blue-400 flex items-center gap-1">Right Economic <i class="fa-solid fa-angles-right"></i></span>
+                            </div>
+                            <div class="relative w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                <div id="score-bar-x" class="absolute bg-blue-500 h-full w-1/2 left-1/2 rounded-full transition-all duration-500"></div>
+                            </div>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400">
+                                <span>Strong Socialist/State-led</span>
+                                <span class="font-bold text-slate-200" id="score-val-x">0%</span>
+                                <span>Strong Market-led</span>
+                            </div>
+                        </div>
+
+                        <!-- Y Axis bar (Auth/Lib) -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-circle-down"></i> Libertarian</span>
+                                <span class="text-violet-400 flex items-center gap-1">Authoritarian <i class="fa-solid fa-circle-up"></i></span>
+                            </div>
+                            <div class="relative w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                <div id="score-bar-y" class="absolute bg-violet-500 h-full w-1/2 bottom-0 left-1/2 rounded-full transition-all duration-500"></div>
+                            </div>
+                            <div class="flex justify-between items-center text-[10px] text-slate-400">
+                                <span>Social Autonomy / Freedom</span>
+                                <span class="font-bold text-slate-200" id="score-val-y">0%</span>
+                                <span>Strong State Governance</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action items -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="shareResultsLink()" class="flex-grow py-3 px-6 bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/20 transition-all flex items-center justify-center space-x-2" id="share-invite-button">
+                            <i class="fa-solid fa-link"></i>
+                            <span>Generate & Copy Invite Link</span>
+                        </button>
+                        <button onclick="shareInviteWhatsApp()" class="py-3 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span>Share Stance</span>
+                        </button>
+                        <button onclick="retakeQuiz()" class="py-3 px-6 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-xl transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>Retake Quiz</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Dashboard panel: Friends Who Completed Your Quiz (Creators only view) -->
+            <div id="creator-friends-dashboard" class="hidden bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Friends Who Took Your Quiz</h3>
+                        <p class="text-xs text-slate-400">Click a friend below to plot them on your compass and check their ballot options!</p>
+                    </div>
+                </div>
+                <!-- Dynamic Horizontal list of friends badges -->
+                <div id="friends-badge-list" class="flex flex-wrap gap-2.5">
+                    <!-- Loaded dynamically in JavaScript -->
+                </div>
+            </div>
+
+            <!-- Comparative Ballot Sheet Breakdown Card (Voted Options) -->
+            <div id="comparative-ballot-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Voted Ballot Comparisons</h3>
+                        <p class="text-xs text-slate-400" id="ballot-card-description">Reviewing individual responses across the 15-question suite.</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic comparative ballot sheet item container -->
+                <div id="comparative-ballot-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Loaded dynamically in JS -->
+                </div>
+            </div>
+
+            <!-- Benchmark Reference Box -->
+            <div id="benchmark-drawer" class="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-landmark text-orange-400"></i>
+                    <h3 class="text-lg font-bold text-white">Indian Political Milestones & Comparisons</h3>
+                </div>
+                <p class="text-sm text-slate-400">
+                    India's democracy is dynamic. Select a milestone below to read how historic forces map on this compass compared to you:
+                </p>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                    <button onclick="highlightBenchmark('nehru')" class="p-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-xs font-semibold transition-all">
+                        Nehru-Era Socialism
+                    </button>
+                    <button onclick="highlightBenchmark('bjp')" class="p-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-xs font-semibold transition-all">
+                        Modern BJP Ideology
+                    </button>
+                    <button onclick="highlightBenchmark('cpim')" class="p-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-xs font-semibold transition-all">
+                        Marxist Front (CPI-M)
+                    </button>
+                    <button onclick="highlightBenchmark('swatantra')" class="p-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-xs font-semibold transition-all">
+                        Swatantra Laissez-faire
+                    </button>
+                    <button onclick="highlightBenchmark('gandhian')" class="p-2.5 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-xl text-xs font-semibold transition-all">
+                        Gandhian Decentralization
+                    </button>
+                </div>
+
+                <!-- Hidden Benchmark Explanation Container -->
+                <div id="benchmark-desc-box" class="hidden mt-4 p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2 text-xs sm:text-sm animate-fadeIn">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span id="benchmark-name" class="font-bold text-indigo-400 uppercase tracking-wider">Benchmark</span>
+                        <span id="benchmark-coords" class="text-slate-500 font-mono text-[11px]">(0.0, 0.0)</span>
+                    </div>
+                    <p id="benchmark-text" class="text-slate-300 leading-relaxed"></p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 relative transform transition-all">
+            <div class="flex items-center space-x-3 text-orange-400 text-2xl">
+                <i class="fa-solid fa-circle-info"></i>
+                <h3 class="text-xl font-bold text-white" id="modal-title">About LokNiti</h3>
+            </div>
+            <div class="text-slate-300 text-sm leading-relaxed space-y-4" id="modal-content">
+                <p>
+                    <strong>LokNiti India</strong> is an educational civic visualization web app designed to map political opinions relative to the multifaceted public debates of modern India.
+                </p>
+                <p>
+                    Unlike Western compasses that focus strictly on private taxation versus social liberalism, this model factors in major Indian policies like agrarian state support (MSP), social representation programs (reservations), cultural codification laws (UCC), and internal federal systems.
+                </p>
+                <p>
+                    All scores are normalized dynamic coordinates based on balanced weighted indicators. No data is stored, shared, or compiled outside your browser context.
+                </p>
+            </div>
+            <button onclick="closeInfoModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition-all">
+                Dismiss
+            </button>
+        </div>
+    </div>
+
+    <!-- Interactive Toast Box -->
+    <div id="toast-message" class="fixed bottom-5 right-5 z-50 hidden bg-emerald-950 border border-emerald-500/50 text-emerald-200 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 text-sm animate-bounce">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-text">Success! Text copied to clipboard.</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950/60 py-6 text-center text-xs text-slate-500 space-y-1 z-10 font-medium">
+        <p>&copy; 2026 LokNiti. Dynamic Indian Political Spectrum Matrix.</p>
+        <p>Values & questions formulated around historical policy documents & modern socio-legal dynamics.</p>
+    </footer>
+
+    <!-- ES Module Script: Initializing Firebase configuration & executing flow calculations -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your exact requested Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC4Zoi_mGB-qG6vnXRz1m91VYDsmTVG-cI",
+            authDomain: "lokniti-quiz.firebaseapp.com",
+            projectId: "lokniti-quiz",
+            storageBucket: "lokniti-quiz.firebasestorage.app",
+            messagingSenderId: "235470842032",
+            appId: "1:235470842032:web:68f79d2ff3b6f53ee3b375"
+        };
+
+        const SITE_URL = window.location.origin + window.location.pathname;
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'lokniti-compass-app';
+
+        const quizQuestions = [
+            {
+                id: 1,
+                category: "Public Welfare & Economics",
+                text: "The government must prioritize privatizing debt-ridden public sector undertakings (PSUs) and state-run banks to enable free-market efficiency.",
+                explanation: "PSUs are government-run businesses. Privatizing means selling them to private owners to increase efficiency and save taxpayer money.",
+                weightX: 1.8,
+                weightY: -0.4
+            },
+            {
+                id: 2,
+                category: "Subsidies & Fiscal Balance",
+                text: "State welfare schemes like direct cash transfers and free electricity are necessary policies for poor empowerment, despite rising fiscal deficits.",
+                explanation: "Welfare benefits like free power or cash help poor families survive, but they cost a lot of public money and increase government debt.",
+                weightX: -1.7,
+                weightY: 0.3
+            },
+            {
+                id: 3,
+                category: "Social Justice & Representation",
+                text: "Reservation (affirmative action) in education and employment should eventually be replaced by purely economic criteria or meritocratic evaluation.",
+                explanation: "Reservations currently help backward castes get college seats & jobs. This suggests shifting reservations strictly to a family's financial income instead of caste.",
+                weightX: 1.3,
+                weightY: -0.3
+            },
+            {
+                id: 4,
+                category: "Censorship & Expression",
+                text: "The state has a primary duty to filter or censor films, literary works, and social media posts that threaten public order or hurt religious beliefs.",
+                explanation: "Blocking or banning movies, books, or posts to prevent social conflict or stop religious sentiments from getting hurt.",
+                weightX: 0.2,
+                weightY: 2.2
+            },
+            {
+                id: 5,
+                category: "Security & Civil Liberties",
+                text: "Strict internal surveillance and laws like UAPA or AFSPA are entirely justified to preserve state integrity, even if individual privacy is compromised.",
+                explanation: "Allowing police or military to track citizens and use tough security laws to stop national threats, even if it limits absolute personal freedom.",
+                weightX: 0.4,
+                weightY: 2.4
+            },
+            {
+                id: 6,
+                category: "Civil Rights & Religion",
+                text: "A Uniform Civil Code (UCC) should be implemented uniformly across India to replace religious personal laws governing marriage and inheritance.",
+                explanation: "Replacing different religious rules about marriage, divorce, and property with one common law code for all Indian citizens.",
+                weightX: 1.4,
+                weightY: 0.5
+            },
+            {
+                id: 7,
+                category: "Corporate & Labor Laws",
+                text: "To accelerate manufacturing investments, India must simplify labor codes, giving companies absolute liberty over hiring, firing, and wage terms.",
+                explanation: "Making business laws easier so factories can hire & fire employees easily to grow quickly and attract investments.",
+                weightX: 1.9,
+                weightY: -0.4
+            },
+            {
+                id: 8,
+                category: "Cultural Legality",
+                text: "The legal prohibition on cow slaughter across Indian states should be fully supported to protect sacred traditions and local community beliefs.",
+                explanation: "Banning cow slaughter by law out of respect for India's sacred religious traditions.",
+                weightX: 1.4,
+                weightY: 1.8
+            },
+            {
+                id: 9,
+                category: "Ecology vs Development",
+                text: "Major infrastructure programs like multi-lane highways or mines should proceed with urgency, even if they displace forest communities or disrupt ecology.",
+                explanation: "Prioritizing massive development projects like highways or mines over environmental conservation and local tribal displacement.",
+                weightX: 1.5,
+                weightY: 0.6
+            },
+            {
+                id: 10,
+                category: "Personal Freedom",
+                text: "Adult individuals should have complete autonomy over their marital, relationship, and dietary choices (including beef or local meat) without state interference.",
+                explanation: "Individuals having complete freedom to eat what they want and marry who they like without government or community rules.",
+                weightX: -0.9,
+                weightY: -2.0
+            },
+            {
+                id: 11,
+                category: "Wealth & Taxes",
+                text: "The government should introduce higher wealth taxes and inheritance taxes on the ultra-rich to fund expansive rural healthcare and education.",
+                explanation: "Taxing high-earners and super-rich families extra to build free rural hospitals and schools for the poor.",
+                weightX: -1.8,
+                weightY: 0.4
+            },
+            {
+                id: 12,
+                category: "Federalism & Decentralization",
+                text: "State governments must possess greater sovereignty over local taxation and policy, minimizing centralized control of authorities in New Delhi.",
+                explanation: "Giving individual state governments (like Tamil Nadu or Punjab) more autonomy to make decisions and collect taxes instead of centralizing power in Delhi.",
+                weightX: -0.4,
+                weightY: -1.8
+            },
+            {
+                id: 13,
+                category: "Educational Curricula",
+                text: "History text books should prioritize historical local cultural icons, nationalist perspectives, and traditional pride over secular or global structures.",
+                explanation: "Teaching school children more about native empires, local heroes, and Indian achievements in historical books.",
+                weightX: 1.3,
+                weightY: 0.9
+            },
+            {
+                id: 14,
+                category: "Protests & Dissidence",
+                text: "Public agitations that block key state arteries, highways, or transport terminals should be forcibly cleared by law enforcement to ensure public convenience.",
+                explanation: "Letting police use force to clear blockades and protests on public highways to avoid public inconvenience and preserve order.",
+                weightX: 0.4,
+                weightY: 2.1
+            },
+            {
+                id: 15,
+                category: "Agrarian Regulations",
+                text: "The state must mandate statutory Minimum Support Prices (MSP) for agricultural goods to protect marginal farmers from open market volatility.",
+                explanation: "Setting a guaranteed price minimum (MSP) for crops by law so markets can't exploit poor farmers.",
+                weightX: -1.6,
+                weightY: 0.5
+            }
+        ];
+
+        const benchmarks = {
+            nehru: {
+                name: "Nehruvian Center-Left Socialism",
+                coords: { x: -3.5, y: 3.0 },
+                desc: "An era defined by state-directed developmental planning, heavy industry public sector control, and an active socialist model, maintained within a unified parliamentary democracy."
+            },
+            bjp: {
+                name: "Modern BJP Ideology (NDA Spectrum)",
+                coords: { x: 4.5, y: 5.0 },
+                desc: "Characterized by cultural nationalism (Hindutva), integrationist laws like the Uniform Civil Code, direct benefit transfers (DBT) combined with market capitalization, and a strong central state model."
+            },
+            cpim: {
+                name: "The Left Front Spectrum (CPI-M)",
+                coords: { x: -8.0, y: 6.0 },
+                desc: "Strong state intervention, radical land distribution policies, state-controlled infrastructure protectionism, and strong labor collective rights, rejecting multinational corporations."
+            },
+            swatantra: {
+                name: "Historical Swatantra Party",
+                coords: { x: 7.0, y: -4.5 },
+                desc: "Founded by C. Rajagopalachari to oppose Nehru's 'License Raj'. Advocated for absolute economic deregulation, free trade, private ownership, and minimal state taxation combined with robust civil liberties."
+            },
+            gandhian: {
+                name: "Gandhian Gram Swaraj",
+                coords: { x: -4.0, y: -6.0 },
+                desc: "A decentralized model advocating for village-level self-sufficiency, localized cooperative agriculture, hand-spun textiles, ecological balance, and minimal power vested in centralized bureaucracies."
+            }
+        };
+
+        const scoreLabels = {
+            "2": "Strongly Agree",
+            "1": "Agree",
+            "0": "Neutral",
+            "-1": "Disagree",
+            "-2": "Strongly Disagree"
+        };
+
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(quizQuestions.length).fill(null);
+        let userName = "Anonymous Citizen";
+        let finalCoordX = 0.0;
+        let finalCoordY = 0.0;
+
+        let myUserId = localStorage.getItem('lokniti_stored_user_id');
+        if (!myUserId) {
+            myUserId = "user_" + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('lokniti_stored_user_id', myUserId);
+        }
+
+        // Invite identification checks
+        let inviteSenderId = null;
+        let inviteSenderData = null;
+        let comparisonActive = false;
+
+        // Bootstrapping auth & executing dynamic background router
+        const initCloudService = async () => {
+            updateCloudIndicator("connecting", "Connecting to cloud...");
+            try {
+                await signInAnonymously(auth);
+                updateCloudIndicator("ready", "Cloud Synchronized");
+                executeRouteInspection();
+            } catch (err) {
+                console.error("Firebase auth breakdown: ", err);
+                updateCloudIndicator("offline", "Offline Mode Active");
+            }
+        };
+
+        // Initialize immediately
+        initCloudService();
+
+        async function executeRouteInspection() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check for invite links
+            if (urlParams.has('invite')) {
+                inviteSenderId = urlParams.get('invite');
+                updateCloudIndicator("syncing", "Loading invite sender details...");
+                
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', inviteSenderId);
+                    const snapshot = await getDoc(docRef);
+                    
+                    if (snapshot.exists()) {
+                        inviteSenderData = snapshot.data();
+                        
+                        // Show invite challenge visual header on Home screen
+                        const inviterHeader = document.getElementById('challenge-invite-header');
+                        inviterHeader.classList.remove('hidden');
+                        document.getElementById('challenger-name-label').innerText = inviteSenderData.userName;
+                        updateCloudIndicator("ready", `Challenged by ${inviteSenderData.userName}`);
+                    }
+                } catch (e) {
+                    console.error("Failed loading inviter sheet: ", e);
+                    updateCloudIndicator("ready", "Failed syncing inviter");
+                }
+            }
+        }
+
+        function updateCloudIndicator(status, text) {
+            const ind = document.getElementById('inline-cloud-indicator');
+            const pulse = document.getElementById('cloud-pulse-color');
+            const dot = document.getElementById('cloud-dot-color');
+            const label = document.getElementById('cloud-status-text');
+
+            label.innerText = text;
+
+            // Reset classes
+            pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75";
+            dot.className = "relative inline-flex rounded-full h-2 w-2";
+
+            if (status === "connecting" || status === "syncing") {
+                pulse.classList.add("bg-amber-400");
+                dot.classList.add("bg-amber-500");
+            } else if (status === "ready") {
+                pulse.classList.add("bg-emerald-400");
+                dot.classList.add("bg-emerald-500");
+            } else {
+                pulse.classList.add("bg-rose-400");
+                dot.classList.add("bg-rose-500");
+            }
+        }
+
+        // Beginning the quiz sequence
+        window.startQuiz = () => {
+            const inputVal = document.getElementById('user-name-input').value.trim();
+            userName = inputVal ? inputVal : "Anonymous Citizen";
+
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            renderQuestion();
+        };
+
+        window.startFreshQuiz = () => {
+            inviteSenderId = null;
+            inviteSenderData = null;
+            comparisonActive = false;
+
+            document.getElementById('challenge-invite-header').classList.add('hidden');
+            document.getElementById('comparison-view-alert').classList.add('hidden');
+            document.getElementById('friend-map-legend').classList.add('hidden');
+            document.getElementById('friend-dot-group').classList.add('hidden');
+            document.getElementById('creator-friends-dashboard').classList.add('hidden');
+
+            window.history.pushState({}, '', window.location.pathname);
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('user-name-input').value = "";
+            updateCloudIndicator("ready", "Cloud Synchronized");
+        };
+
+        function renderQuestion() {
+            const currentQ = quizQuestions[currentQuestionIndex];
+            const card = document.getElementById('question-card');
+
+            card.classList.remove('animate-question-slide');
+            void card.offsetWidth; // Repaint trigger
+            card.classList.add('animate-question-slide');
+
+            document.getElementById('question-category').innerText = currentQ.category;
+            document.getElementById('question-text').innerText = currentQ.text;
+            document.getElementById('question-explanation').innerText = currentQ.explanation;
+
+            document.getElementById('quiz-progress-current').innerText = currentQuestionIndex + 1;
+            document.getElementById('quiz-progress-total').innerText = quizQuestions.length;
+
+            const percent = Math.round((currentQuestionIndex / quizQuestions.length) * 100);
+            document.getElementById('quiz-progress-bar').style.width = `${percent}%`;
+            document.getElementById('quiz-progress-percent').innerText = `${percent}% Completed`;
+
+            document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
+
+            clearActiveOptionSelection();
+            const pastAnswer = userAnswers[currentQuestionIndex];
+            if (pastAnswer !== null) {
+                highlightSelectedOption(pastAnswer);
+            }
+        }
+
+        window.recordAnswer = (scoreValue) => {
+            userAnswers[currentQuestionIndex] = scoreValue;
+            setTimeout(() => {
+                if (currentQuestionIndex < quizQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    processResultsAndSave();
+                }
+            }, 180);
+        };
+
+        window.goToPreviousQuestion = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        };
+
+        function clearActiveOptionSelection() {
+            const containers = document.getElementById('options-container').children;
+            for (let btn of containers) {
+                btn.classList.remove('bg-slate-800', 'border-indigo-500/50', 'ring-2', 'ring-indigo-500/20');
+                btn.classList.add('bg-slate-800/40', 'border-slate-700/60');
+            }
+        }
+
+        function highlightSelectedOption(scoreValue) {
+            const containers = document.getElementById('options-container').children;
+            let targetIdx = 2;
+            if (scoreValue === 2) targetIdx = 0;
+            else if (scoreValue === 1) targetIdx = 1;
+            else if (scoreValue === 0) targetIdx = 2;
+            else if (scoreValue === -1) targetIdx = 3;
+            else if (scoreValue === -2) targetIdx = 4;
+
+            const targetBtn = containers[targetIdx];
+            targetBtn.classList.remove('bg-slate-800/40', 'border-slate-700/60');
+            targetBtn.classList.add('bg-slate-800', 'border-indigo-500/50', 'ring-2', 'ring-indigo-500/20');
+        }
+
+        async function processResultsAndSave() {
+            updateCloudIndicator("syncing", "Calculating coordinates...");
+            
+            let totalX = 0;
+            let totalY = 0;
+            let maxX = 0;
+            let maxY = 0;
+
+            for (let i = 0; i < quizQuestions.length; i++) {
+                const q = quizQuestions[i];
+                const choiceMultiplier = userAnswers[i];
+
+                totalX += choiceMultiplier * q.weightX;
+                totalY += choiceMultiplier * q.weightY;
+
+                maxX += 2.0 * Math.abs(q.weightX);
+                maxY += 2.0 * Math.abs(q.weightY);
+            }
+
+            finalCoordX = parseFloat(((totalX / maxX) * 10).toFixed(1));
+            finalCoordY = parseFloat(((totalY / maxY) * 10).toFixed(1));
+
+            // Sync with Firestore safely using persistent myUserId
+            updateCloudIndicator("syncing", "Syncing stance to cloud...");
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', myUserId);
+                await setDoc(docRef, {
+                    userId: myUserId,
+                    userName: userName,
+                    x: finalCoordX,
+                    y: finalCoordY,
+                    answers: userAnswers,
+                    invitedBy: inviteSenderId || null, // Saves the id of the friend who invited them
+                    timestamp: Date.now()
+                }, { merge: true });
+
+                updateCloudIndicator("ready", "Stance Synced Safely");
+                showToast("Your result has been safely posted to LokNiti!");
+
+            } catch (err) {
+                console.error("Cloud write failure: ", err);
+                updateCloudIndicator("offline", "Save Failed - Running Offline");
+            }
+
+            // Screen switch
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+
+            // Default Setup
+            plotUserCoordinate(finalCoordX, finalCoordY);
+            renderDetailedProfile(finalCoordX, finalCoordY);
+
+            // Execute Comparison layout or Creator dashboard queries based on flow
+            if (inviteSenderId && inviteSenderData) {
+                comparisonActive = true;
+                setupMatchupComparisonView(inviteSenderData);
+            } else {
+                comparisonActive = false;
+                // Since user is a standalone creator, query if any friends took *their* quiz
+                await checkAndLoadFriendSubmits();
+            }
+        }
+
+        function plotUserCoordinate(x, y) {
+            const centerX = 200;
+            const centerY = 200;
+            const scaleFactor = 18;
+
+            const targetCX = centerX + (x * scaleFactor);
+            const targetCY = centerY - (y * scaleFactor);
+
+            const dot = document.getElementById('user-dot');
+            const pulse = document.getElementById('user-dot-pulse');
+
+            dot.setAttribute('cx', targetCX);
+            dot.setAttribute('cy', targetCY);
+            pulse.setAttribute('cx', targetCX);
+            pulse.setAttribute('cy', targetCY);
+
+            document.getElementById('coord-display-x').innerText = x > 0 ? `+${x}` : x;
+            document.getElementById('coord-display-y').innerText = y > 0 ? `+${y}` : y;
+        }
+
+        function renderDetailedProfile(x, y) {
+            let quadrantTitle = "";
+            let quadrantDesc = "";
+
+            if (x >= 0 && y >= 0) {
+                quadrantTitle = "Authoritarian Right: National Conservatism";
+                quadrantDesc = "You favor robust cultural values combined with a productive, market-oriented economic strategy. You support strong state management in matters of national security, social stability, and state unity. In an Indian environment, your opinions align with policies of privatization, nationalistic integration (such as the Uniform Civil Code), and robust industrial development led by strong government structures.";
+            } else if (x < 0 && y >= 0) {
+                quadrantTitle = "Authoritarian Left: State Socialism";
+                quadrantDesc = "You prioritize broad welfare structures, centralized economic planning, and comprehensive government oversight. You view state assets and public sectors as critical resources for social security and poverty alleviation, and support state systems managing cultural and religious divisions to protect harmony. This mirrors the historic planning commissions, state control, and intensive public distribution systems of Indian socialism.";
+            } else if (x < 0 && y < 0) {
+                quadrantTitle = "Libertarian Left: Grassroots Swaraj";
+                quadrantDesc = "You believe in localized governance, direct democracy, and decentralized economics. You support extensive welfare networks, environmental safeguards over absolute industrialization, and strong human rights representations. You vigorously advocate for personal liberty, dietary freedoms, and civil liberties, aligning closely with Mahatma Gandhi’s historic vision of localized Gram Swaraj or civil reform initiatives.";
+            } else {
+                quadrantTitle = "Libertarian Right: Laissez-Faire Liberalism";
+                quadrantDesc = "You advocate for deregulation, privatization, and an open market coupled with expansive civil and lifestyle liberties. You reject heavy tax structures, public sector ownership, and state interference in individual/corporate affairs, while simultaneously opposing moral state control over personal choices. Your viewpoints reflect the classical liberalism championed by India's historical Swatantra Party advocates.";
+            }
+
+            document.getElementById('result-quadrant-name').innerText = quadrantTitle;
+            document.getElementById('result-quadrant-desc').innerText = quadrantDesc;
+
+            // Render details progress indicators
+            const xPercent = ((x + 10) / 20) * 100;
+            const yPercent = ((y + 10) / 20) * 100;
+
+            const barX = document.getElementById('score-bar-x');
+            const barY = document.getElementById('score-bar-y');
+
+            barX.style.left = `${Math.min(xPercent, 50)}%`;
+            barX.style.width = `${Math.abs(xPercent - 50)}%`;
+            if (x < 0) {
+                barX.classList.remove('bg-blue-500');
+                barX.classList.add('bg-rose-500');
+            } else {
+                barX.classList.remove('bg-rose-500');
+                barX.classList.add('bg-blue-500');
+            }
+
+            barY.style.left = `${Math.min(yPercent, 50)}%`;
+            barY.style.width = `${Math.abs(yPercent - 50)}%`;
+            if (y < 0) {
+                barY.classList.remove('bg-violet-500');
+                barY.classList.add('bg-emerald-500');
+            } else {
+                barY.classList.remove('bg-emerald-500');
+                barY.classList.add('bg-violet-500');
+            }
+
+            document.getElementById('score-val-x').innerText = x > 0 ? `${Math.round(x * 10)}% Right` : `${Math.round(Math.abs(x) * 10)}% Left`;
+            document.getElementById('score-val-y').innerText = y > 0 ? `${Math.round(y * 10)}% Authoritarian` : `${Math.round(Math.abs(y) * 10)}% Libertarian`;
+        }
+
+        function setupMatchupComparisonView(friendData) {
+            // Plot Friend on compass
+            const centerX = 200;
+            const centerY = 200;
+            const scaleFactor = 18;
+
+            const fCX = centerX + (friendData.x * scaleFactor);
+            const fCY = centerY - (friendData.y * scaleFactor);
+
+            const friendGroup = document.getElementById('friend-dot-group');
+            const friendDot = document.getElementById('friend-dot');
+
+            friendGroup.classList.remove('hidden');
+            friendDot.setAttribute('cx', fCX);
+            friendDot.setAttribute('cy', fCY);
+
+            // Turn on compared alerts & legends
+            const compAlert = document.getElementById('comparison-view-alert');
+            compAlert.classList.remove('hidden');
+            document.getElementById('shared-friend-name').innerText = friendData.userName;
+
+            const mapLegend = document.getElementById('friend-map-legend');
+            mapLegend.classList.remove('hidden');
+            document.getElementById('friend-legend-name').innerText = friendData.userName;
+            document.getElementById('friend-coord-display-x').innerText = friendData.x > 0 ? `+${friendData.x}` : friendData.x;
+            document.getElementById('friend-coord-display-y').innerText = friendData.y > 0 ? `+${friendData.y}` : friendData.y;
+
+            // Render side-by-side ballot breakdowns
+            renderComparativeBallot(friendData);
+        }
+
+        // Render comparative side-by-side answers or standalone own answers
+        function renderComparativeBallot(compareFriend = null) {
+            const listContainer = document.getElementById('comparative-ballot-list');
+            listContainer.innerHTML = '';
+
+            const descLabel = document.getElementById('ballot-card-description');
+            if (compareFriend) {
+                descLabel.innerHTML = `Comparing your answers side-by-side with <span class="text-orange-400 font-semibold">${compareFriend.userName}</span>.`;
+            } else {
+                descLabel.innerText = "Reviewing your selected responses across the 15-question suite.";
+            }
+
+            quizQuestions.forEach((q, idx) => {
+                const myVal = userAnswers[idx];
+                const myText = scoreLabels[String(myVal)] || "Unsure";
+
+                let myColor = "text-slate-400";
+                if (myVal > 0) myColor = "text-emerald-400 font-semibold";
+                else if (myVal < 0) myColor = "text-rose-400 font-semibold";
+
+                let ballotComparisonHTML = "";
+
+                if (compareFriend) {
+                    const friendVal = compareFriend.answers[idx];
+                    const friendText = scoreLabels[String(friendVal)] || "Unsure";
+
+                    let friendColor = "text-slate-400";
+                    if (friendVal > 0) friendColor = "text-emerald-400 font-semibold";
+                    else if (friendVal < 0) friendColor = "text-rose-400 font-semibold";
+
+                    ballotComparisonHTML = `
+                        <div class="pt-2 border-t border-slate-800/80 grid grid-cols-2 gap-4 text-xs">
+                            <div class="space-y-0.5 border-r border-slate-800/80 pr-2">
+                                <span class="text-[10px] text-slate-500 uppercase block font-medium">You:</span>
+                                <span class="${myColor}">${myText}</span>
+                            </div>
+                            <div class="space-y-0.5 pl-2">
+                                <span class="text-[10px] text-slate-500 uppercase block font-medium">${compareFriend.userName}:</span>
+                                <span class="${friendColor}">${friendText}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    ballotComparisonHTML = `
+                        <div class="pt-2 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                            <span class="text-[10px] text-slate-500 uppercase font-medium">Your answer:</span>
+                            <span class="${myColor}">${myText}</span>
+                        </div>
+                    `;
+                }
+
+                const cardHTML = `
+                    <div class="p-4 bg-slate-950/40 border border-slate-800 rounded-2xl flex flex-col justify-between space-y-3">
+                        <div class="space-y-1">
+                            <span class="text-[9px] uppercase font-extrabold text-indigo-400 tracking-wider">Q${idx+1}: ${q.category}</span>
+                            <p class="text-xs text-slate-300 font-medium leading-relaxed">${q.text}</p>
+                        </div>
+                        ${ballotComparisonHTML}
+                    </div>
+                `;
+                listContainer.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        async function checkAndLoadFriendSubmits() {
+            // Guard clause
+            if (!myUserId) return;
+
+            updateCloudIndicator("syncing", "Loading invite analytics...");
+            try {
+                // Fetch results document collection matching query parameters
+                const resultsCol = collection(db, 'artifacts', appId, 'public', 'data', 'results');
+                const q = query(resultsCol, where("invitedBy", "==", myUserId));
+                const snapshot = await getDocs(q);
+
+                const badgesList = document.getElementById('friends-badge-list');
+                badgesList.innerHTML = '';
+
+                if (!snapshot.empty) {
+                    document.getElementById('creator-friends-dashboard').classList.remove('hidden');
+                    
+                    snapshot.forEach((docSnap) => {
+                        const fData = docSnap.data();
+                        
+                        const btnHTML = `
+                            <button class="px-4 py-2 bg-slate-800/60 hover:bg-slate-800 hover:border-sky-500/50 border border-slate-700/50 rounded-xl text-xs font-semibold flex items-center space-x-2 transition-all" onclick="compareWithFriendDirectly('${docSnap.id}')">
+                                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                                <span class="text-slate-200">${fData.userName}</span>
+                            </button>
+                        `;
+                        badgesList.insertAdjacentHTML('beforeend', btnHTML);
+                    });
+                    
+                    updateCloudIndicator("ready", `${snapshot.size} Friend Matchups Live`);
+                } else {
+                    updateCloudIndicator("ready", "Stance Synced Safely");
+                }
+            } catch (err) {
+                console.error("Dashboard check failed: ", err);
+                updateCloudIndicator("ready", "Failed syncing dashboard");
+            }
+        }
+
+        // Globalized handler for dynamic friend checks
+        window.compareWithFriendDirectly = async (fId) => {
+            updateCloudIndicator("syncing", "Loading comparisons...");
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'results', fId);
+                const snapshot = await getDoc(docRef);
+
+                if (snapshot.exists()) {
+                    const friendDetails = snapshot.data();
+                    setupMatchupComparisonView(friendDetails);
+                    
+                    updateCloudIndicator("ready", `Comparing with ${friendDetails.userName}`);
+                    showToast(`Plotting comparison with ${friendDetails.userName}!`);
+                    
+                    // Smoothly scroll down to side-by-side comparison panel
+                    document.getElementById('comparative-ballot-card').scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (err) {
+                console.error("Failed comparative fetch: ", err);
+                updateCloudIndicator("ready", "Comparative fetch failed");
+            }
+        };
+
+        window.shareResultsLink = () => {
+            // Invites are indexed under Creator's local identification signature
+            const customInviteUrl = `${SITE_URL}?invite=${myUserId}`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = customInviteUrl;
+            textarea.style.position = 'fixed'; 
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast("Invite link copied! Share it with friends to plot alignments together.");
+            } catch (err) {
+                showToast("Failed to copy. Manually copy standard URL configurations.");
+            }
+            document.body.removeChild(textarea);
+        };
+
+        window.shareInviteWhatsApp = () => {
+            const customInviteUrl = `${SITE_URL}?invite=${myUserId}`;
+            const message = `Yo! Check out where I stand on the Indian Political Compass: ${document.getElementById('result-quadrant-name').innerText} (Coords: X:${finalCoordX}, Y:${finalCoordY}).\n\nTake the quiz from this link to compare your alignment directly with mine on the same map: ${customInviteUrl}`;
+            
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        };
+
+        // Standard helpers
+        window.openInfoModal = () => {
+            document.getElementById('custom-modal').classList.remove('hidden');
+        };
+
+        window.closeInfoModal = () => {
+            document.getElementById('custom-modal').classList.add('hidden');
+        };
+    </script>
+</body>
+</html>
